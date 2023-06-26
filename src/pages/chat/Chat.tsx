@@ -11,6 +11,8 @@ import { UserChatMessage } from "../../components/UserChatMessage";
 import { AnalysisPanel, AnalysisPanelTabs } from "../../components/AnalysisPanel";
 import { SettingsButton } from "../../components/SettingsButton";
 import { ClearChatButton } from "../../components/ClearChatButton";
+import { Modal } from "antd";
+import {config} from "../../Utils/Utils"
 
 const Chat = () => {
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
@@ -32,6 +34,10 @@ const Chat = () => {
 
     const [selectedAnswer, setSelectedAnswer] = useState<number>(0);
     const [answers, setAnswers] = useState<[user: string, response: AskResponse][]>([]);
+
+    const [selectedFile, setSelectedFile] = useState<File|null>();
+
+    const [modal, contextHolder] = Modal.useModal();
 
     // const makeApiRequest = async (question: string) => {
     //     lastQuestionRef.current = question;
@@ -65,14 +71,23 @@ const Chat = () => {
     // };
 
     const makeApiRequest = async (question: string) => {
-        lastQuestionRef.current = question;
 
+        if(!selectedFile)
+        {
+            modal.warning(config)
+            // TO make sure questions cant be asked without attaching a document first
+            return
+        }
+
+        lastQuestionRef.current = question;
         let temp_response={answer:"Policy number is 123 [1]. Effective date is 2022-1-1 [2].", thoughts:"", data_points: ["Policy_number","Effective_date"]}
         let temp = ["TestUser",temp_response]
         error && setError(undefined);
         setIsLoading(true);
         setActiveCitation(undefined);
         setActiveAnalysisPanelTab(undefined);
+
+
 
         try {
             const history: ChatTurn[] = answers.map(a => ({ user: a[0], bot: a[1].answer }));
@@ -164,6 +179,7 @@ const Chat = () => {
 
     return (
         <div className={styles.container}>
+            {contextHolder}
             <div className={styles.commandsContainer}>
                 <ClearChatButton className={styles.commandButton} onClick={clearChat} disabled={!lastQuestionRef.current || isLoading} />
                 <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
@@ -225,6 +241,8 @@ const Chat = () => {
                             placeholder="Type a question"
                             disabled={isLoading}
                             onSend={question => makeApiRequest(question)}
+                            selectedFile={selectedFile}
+                            setSelectedFile={setSelectedFile}
                         />
                     </div>
                 </div>

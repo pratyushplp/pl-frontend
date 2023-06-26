@@ -2,36 +2,27 @@ import { useState } from "react";
 import { Stack, TextField} from "@fluentui/react";
 import { Modal } from "antd";
 import { Send28Filled,Attach24Filled,ArrowUpload24Filled } from "@fluentui/react-icons";
-
+import {config} from "../../Utils/Utils"
 
 import styles from "./QuestionInput.module.css";
 
 interface Props {
     onSend(questions: string):void,
+    setSelectedFile(value:File|null):void,
     disabled: boolean,
     placeholder?: string,
-    clearOnSend?: boolean
+    clearOnSend?: boolean,
+    selectedFile?: File|null
 }
 
-//TODO: dont let the user ask question without uploading a document.
-//Modal window telling to upload document
-//How to make sure that the user only uploads pdf file
+//TODO:
+// assing a type for selectedFile
 
- export const QuestionInput = ({onSend, disabled, placeholder="Enter Prompt", clearOnSend}:Props) =>
+ export const QuestionInput = ({onSend, setSelectedFile, disabled, placeholder="Enter Prompt", clearOnSend,selectedFile}:Props) =>
 {
     const [question, setQuestion] = useState<string>("");
-    const [selectedFile, setSelectedFile] = useState(null);
+    // const [selectedFile, setSelectedFile] = useState(null);
     const [modal, contextHolder] = Modal.useModal();
-    const config = {
-        title: 'No document uploaded!',
-        content: (
-          <>
-          <p>
-            Please upload a document first.
-          </p>
-          </>
-        ),
-      };
 
     const sendQuestion = () =>
     {
