@@ -9,12 +9,18 @@ import { QuestionInput } from "../../components/QuestionInput";
 import { ExampleList } from "../../components/Example";
 import { UserChatMessage } from "../../components/UserChatMessage";
 import { AnalysisPanel, AnalysisPanelTabs } from "../../components/AnalysisPanel";
-import { SettingsButton } from "../../components/SettingsButton";
 import { ClearChatButton } from "../../components/ClearChatButton";
-import { Modal } from "antd";
+import { Modal,Button } from "antd";
 import {config} from "../../Utils/Utils"
-
+import {ExampleDatapoints,TestA} from "../../components/Example"
 const Chat = () => {
+
+    type objectProp =
+{
+  label:string|number
+  value:string
+}
+
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
     const [promptTemplate, setPromptTemplate] = useState<string>("");
     const [retrieveCount, setRetrieveCount] = useState<number>(3);
@@ -36,6 +42,9 @@ const Chat = () => {
     const [answers, setAnswers] = useState<[user: string, response: AskResponse][]>([]);
 
     const [selectedFile, setSelectedFile] = useState<File|null>();
+    //for example Datapoints
+    const [selectedDatapoints, setSelectedDatapoints] = useState<objectProp[]>([])
+    const [path, setPath] = useState<string|null>(null)
 
     const [modal, contextHolder] = Modal.useModal();
 
@@ -177,24 +186,33 @@ const Chat = () => {
         setSelectedAnswer(index);
     };
 
+    const onSelectedDatapoints=(value:objectProp[])=>
+    {
+        setSelectedDatapoints(value)
+    }
+    const onSelectedPath=(value:string|null)=>
+    {
+        setPath(value)
+    }
+
     return (
         <div className={styles.container}>
             {contextHolder}
             <div className={styles.commandsContainer}>
                 <ClearChatButton className={styles.commandButton} onClick={clearChat} disabled={!lastQuestionRef.current || isLoading} />
-                <SettingsButton className={styles.commandButton} onClick={() => setIsConfigPanelOpen(!isConfigPanelOpen)} />
             </div>
             <div className={styles.chatRoot}>
                 <div className={styles.chatContainer}>
                     {!lastQuestionRef.current ? (
                         <div className={styles.chatEmptyState}>
                             <div className={styles.logoContainer}>
-                            <img src={ajgLogo} alt="icon" className={styles.logo}/>
+                            {/* <img src={ajgLogo} alt="icon" className={styles.logo}/> */}
                             </div>
                             <h2 className={styles.chatEmptyStateTitle}>Chat with your data</h2>
-                            <h3 className={styles.chatEmptyStateSubtitle}>Enter prompt or try an example</h3>
-
-                            <ExampleList onExampleClicked={onExampleClicked} />
+                            <h3 className={styles.chatEmptyStateSubtitle}>Enter prompt or choose from below</h3>
+                            {/* <ExampleList onExampleClicked={onExampleClicked} /> */}
+                            {/* <ExampleCascader selectedQuestions = {selectedQuestions} setSelectedQuestions = {setSelectedQuestions}/> */}
+                            <ExampleDatapoints selectedDatapoints= {selectedDatapoints} onSelectedDatapoints = {onSelectedDatapoints} path={path} onSelectedPath = {onSelectedPath}/>
                         </div>
                     ) : (
                         <div className={styles.chatMessageStream}>
@@ -257,54 +275,6 @@ const Chat = () => {
                         activeTab={activeAnalysisPanelTab}
                     />
                 )}
-
-                <Panel
-                    headerText="Configure answer generation"
-                    isOpen={isConfigPanelOpen}
-                    isBlocking={false}
-                    onDismiss={() => setIsConfigPanelOpen(false)}
-                    closeButtonAriaLabel="Close"
-                    onRenderFooterContent={() => <DefaultButton onClick={() => setIsConfigPanelOpen(false)}>Close</DefaultButton>}
-                    isFooterAtBottom={true}
-                >
-                    <TextField
-                        className={styles.chatSettingsSeparator}
-                        defaultValue={promptTemplate}
-                        label="Override prompt template"
-                        multiline
-                        autoAdjustHeight
-                        onChange={onPromptTemplateChange}
-                    />
-
-                    <SpinButton
-                        className={styles.chatSettingsSeparator}
-                        label="Retrieve this many documents from search:"
-                        min={1}
-                        max={50}
-                        defaultValue={retrieveCount.toString()}
-                        onChange={onRetrieveCountChange}
-                    />
-                    <TextField className={styles.chatSettingsSeparator} label="Exclude category" onChange={onExcludeCategoryChanged} />
-                    <Checkbox
-                        className={styles.chatSettingsSeparator}
-                        checked={useSemanticRanker}
-                        label="Use semantic ranker for retrieval"
-                        onChange={onUseSemanticRankerChange}
-                    />
-                    <Checkbox
-                        className={styles.chatSettingsSeparator}
-                        checked={useSemanticCaptions}
-                        label="Use query-contextual summaries instead of whole documents"
-                        onChange={onUseSemanticCaptionsChange}
-                        disabled={!useSemanticRanker}
-                    />
-                    <Checkbox
-                        className={styles.chatSettingsSeparator}
-                        checked={useSuggestFollowupQuestions}
-                        label="Suggest follow-up questions"
-                        onChange={onUseSuggestFollowupQuestionsChange}
-                    />
-                </Panel>
             </div>
         </div>
     );

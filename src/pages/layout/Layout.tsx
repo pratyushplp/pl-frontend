@@ -1,4 +1,5 @@
 import { Outlet, NavLink, Link } from "react-router-dom";
+import ajgLogo from '../../assets/ajgLogo.png'
 
 // import { IIconProps, IContextualMenuProps, Stack } from '@fluentui/react';
 // import { IconButton } from '@fluentui/react/lib/Button';
@@ -19,9 +20,10 @@ const Layout = () => {
             <header className={styles.header} >
                 <div className={styles.headerContainer}>
                     <Link to="/" className={styles.headerTitleContainer}>
-                        <h3 className={styles.headerTitle}>Gallagher Personal Lines</h3>
+                       <img src={ajgLogo} alt="icon" className={styles.logo}/>
+                        <h3 className={styles.headerTitle}>Gallagher</h3>
                     </Link>
-                    <nav>
+                    <nav className={styles.headerNavList}>
                         <ul className={styles.headerNavList}>
                             <li>
                                 <NavLink to="/" className={({ isActive }) => (isActive ? styles.headerNavPageLinkActive : styles.headerNavPageLink)}>

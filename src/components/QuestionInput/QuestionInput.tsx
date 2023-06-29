@@ -104,7 +104,7 @@ interface Props {
             />
             <div className={styles.questionInputButtonsContainer}>
                 <div
-                    className={`${styles.questionInputSendButton} ${sendQuestionDisabled ? styles.questionInputSendButtonDisabled : ""}`}
+                    className={`${styles.questionInputSendButton}`}
                     aria-label="Ask question button"
                     onClick={sendQuestion}
                 >
