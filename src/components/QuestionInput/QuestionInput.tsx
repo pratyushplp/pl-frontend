@@ -5,6 +5,7 @@ import { Send28Filled,Attach24Filled,ArrowUpload24Filled } from "@fluentui/react
 import {config} from "../../Utils/Utils"
 
 import styles from "./QuestionInput.module.css";
+import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 
 interface Props {
     onSend(questions: string):void,
@@ -12,21 +13,24 @@ interface Props {
     disabled: boolean,
     placeholder?: string,
     clearOnSend?: boolean,
-    selectedFile?: File|null
+    selectedFile?: File|null,
+    selectedDatapoints?: CheckboxValueType[]
 }
 
 //TODO:
 // assing a type for selectedFile
 
- export const QuestionInput = ({onSend, setSelectedFile, disabled, placeholder="Enter Prompt", clearOnSend,selectedFile}:Props) =>
+ export const QuestionInput = ({onSend, setSelectedFile, disabled, placeholder="Enter Prompt", clearOnSend,selectedFile,selectedDatapoints}:Props) =>
 {
     const [question, setQuestion] = useState<string>("");
     // const [selectedFile, setSelectedFile] = useState(null);
     const [modal, contextHolder] = Modal.useModal();
 
-    const sendQuestion = () =>
+    const sendQuestion = async () =>
     {
-        if(disabled || !question.trim())
+        console.log('sendQuestion')
+        console.log(selectedDatapoints)
+        if(disabled || (!question.trim() && (!selectedDatapoints || selectedDatapoints.length==0)))
         {
             return
         }
@@ -36,20 +40,20 @@ interface Props {
             //setIsModalOpen(true)
             return
         }
-
-        onSend(question)
+        console.log('sendQuestion2')
+        await onSend(question)
 
         if(clearOnSend){
             setQuestion("");
         }
     }
 
-    const onEnterPress = (ev: React.KeyboardEvent<Element>) =>
+    const onEnterPress = async (ev: React.KeyboardEvent<Element>) =>
     {
         if(ev.key === "Enter" && !ev.shiftKey)
         {
             ev.preventDefault();
-            sendQuestion();
+            await sendQuestion();
         }
     }
 

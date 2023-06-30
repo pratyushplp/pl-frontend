@@ -13,13 +13,16 @@ import { ClearChatButton } from "../../components/ClearChatButton";
 import { Modal,Button } from "antd";
 import {config} from "../../Utils/Utils"
 import {ExampleDatapoints,TestA} from "../../components/Example"
+import{objectProp} from "../../Utils"
+import type { CheckboxValueType } from 'antd/es/checkbox/Group';
+
 const Chat = () => {
 
-    type objectProp =
-{
-  label:string|number
-  value:string
-}
+// type objectProp =
+// {
+//   label:string|number
+//   value:string
+// }
 
     const [isConfigPanelOpen, setIsConfigPanelOpen] = useState(false);
     const [promptTemplate, setPromptTemplate] = useState<string>("");
@@ -43,7 +46,7 @@ const Chat = () => {
 
     const [selectedFile, setSelectedFile] = useState<File|null>();
     //for example Datapoints
-    const [selectedDatapoints, setSelectedDatapoints] = useState<objectProp[]>([])
+    const [selectedDatapoints, setSelectedDatapoints] = useState<CheckboxValueType[]>([])
     const [path, setPath] = useState<string|null>(null)
 
     const [modal, contextHolder] = Modal.useModal();
@@ -81,12 +84,16 @@ const Chat = () => {
 
     const makeApiRequest = async (question: string) => {
 
+        console.log(`hey they question is ${question}`)
+        console.log(question)
+
         if(!selectedFile)
         {
             modal.warning(config)
             // TO make sure questions cant be asked without attaching a document first
             return
         }
+
 
         lastQuestionRef.current = question;
         let temp_response={answer:"Policy number is 123 [1]. Effective date is 2022-1-1 [2].", thoughts:"", data_points: ["Policy_number","Effective_date"]}
@@ -115,6 +122,7 @@ const Chat = () => {
             // const result = await chatApi(request);
             // setAnswers([...answers, [question, result]]);
             let mock_result = {answer:"Policy number is 456 [1]. Effective date is 2023-1-1 [2].", thoughts:"", data_points: ["Policy_number","Effective_date"]}
+            
             setAnswers([...answers, [question, mock_result]]);
 
         } catch (e) {
@@ -186,9 +194,11 @@ const Chat = () => {
         setSelectedAnswer(index);
     };
 
-    const onSelectedDatapoints=(value:objectProp[])=>
+    const onSelectedDatapoints=(value:CheckboxValueType[])=>
     {
         setSelectedDatapoints(value)
+        console.log("FYI!")
+        console.log(`selected points are ${selectedDatapoints}`)
     }
     const onSelectedPath=(value:string|null)=>
     {
@@ -212,11 +222,12 @@ const Chat = () => {
                             <h3 className={styles.chatEmptyStateSubtitle}>Enter prompt or choose from below</h3>
                             {/* <ExampleList onExampleClicked={onExampleClicked} /> */}
                             {/* <ExampleCascader selectedQuestions = {selectedQuestions} setSelectedQuestions = {setSelectedQuestions}/> */}
-                            <ExampleDatapoints selectedDatapoints= {selectedDatapoints} onSelectedDatapoints = {onSelectedDatapoints} path={path} onSelectedPath = {onSelectedPath}/>
+                            <ExampleDatapoints onSend={question => makeApiRequest(question)} selectedDatapoints= {selectedDatapoints} onSelectedDatapoints = {onSelectedDatapoints} path={path} onSelectedPath = {onSelectedPath}/>
                         </div>
                     ) : (
                         <div className={styles.chatMessageStream}>
-                            {answers.map((answer, index) => (
+                            {
+                            answers.map((answer, index) => (
                                 <div key={index}>
                                     <UserChatMessage message={answer[0]} />
                                     <div className={styles.chatMessageGpt}>
@@ -261,6 +272,7 @@ const Chat = () => {
                             onSend={question => makeApiRequest(question)}
                             selectedFile={selectedFile}
                             setSelectedFile={setSelectedFile}
+                            selectedDatapoints={selectedDatapoints}
                         />
                     </div>
                 </div>

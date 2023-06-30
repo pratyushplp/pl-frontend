@@ -19,6 +19,8 @@ export const Answer = ({
     onCitationClicked,
 }: Props) => {
 
+    console.log("Answer")
+
     const { TextArea } = Input;
 
 

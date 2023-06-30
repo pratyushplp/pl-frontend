@@ -7,29 +7,24 @@ import { Checkbox, Divider } from 'antd';
 import type { CheckboxChangeEvent } from 'antd/es/checkbox';
 import type { CheckboxValueType } from 'antd/es/checkbox/Group';
 import { values } from '@fluentui/react';
-
-type objectProp =
-{
-  label:string|number
-  value:string
-}
+import type {objectProp} from "../../Utils"
 type Props =
 {
-  selectedDatapoints: objectProp[],
-  onSelectedDatapoints:(value: objectProp[])=>void,
+  onSend:(questions: string)=>void,
+  selectedDatapoints: CheckboxValueType[],
+  onSelectedDatapoints:(value: CheckboxValueType[])=>void,
   path:string|null,
   onSelectedPath:(value:string|null)=>void
 }
 
-export const ExampleDatapoints = ({selectedDatapoints, onSelectedDatapoints, path, onSelectedPath}:Props) =>
+export const ExampleDatapoints = ({onSend,selectedDatapoints, onSelectedDatapoints, path, onSelectedPath}:Props) =>
 {
 
   const [showCheckbox, setShowCheckbox] = useState<boolean>(false)
-  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>([]);
+  const [checkedList, setCheckedList] = useState<objectProp[]>([]);
   const [indeterminate, setIndeterminate] = useState<boolean>(true);
   const [checkAll, setCheckAll] = useState<boolean>(false);
 
-  
   console.log(checkedList)
 
   const CheckboxGroup = Checkbox.Group;
@@ -65,27 +60,43 @@ export const ExampleDatapoints = ({selectedDatapoints, onSelectedDatapoints, pat
     onSelectedPath(key)
     if(key == 'PersonalLines/Home' )
     {
-      onSelectedDatapoints(pl_home_datapoints)
+      setCheckedList(pl_home_datapoints)
     }
     else if(key == 'PersonalLines/Auto' )
     {
-      onSelectedDatapoints(pl_auto_datapoints)
+      setCheckedList(pl_auto_datapoints)
+    }
+    else
+    {
+      setCheckedList([])
     }
   };
 
 
 
   const onChange = (list: CheckboxValueType[]) => {
-    setCheckedList(list);
-    setIndeterminate(!!list.length && !!selectedDatapoints && list.length < selectedDatapoints.length);
-    setCheckAll(!!selectedDatapoints && list.length === selectedDatapoints.length);
+    onSelectedDatapoints(list);
+    setIndeterminate(!!list.length && !!checkedList && list.length < checkedList.length);
+    setCheckAll(!!checkedList && list.length === checkedList.length);
   };
 
   const onCheckAllChange = (e: CheckboxChangeEvent) => {
-    setCheckedList(e.target.checked ? selectedDatapoints.map((item)=> item?.label) : []);
+    onSelectedDatapoints(e.target.checked ? checkedList.map((item)=> item?.label) : []);
     setIndeterminate(false);
     setCheckAll(e.target.checked);
   };
+
+  const onSendData = (e: any) =>
+  {
+    if(selectedDatapoints && selectedDatapoints.length>0)
+    {
+      let question = selectedDatapoints.toString()
+      console.log(question)
+      onSend(question)
+    }
+
+
+  }
 
   return(
   <div>
@@ -104,7 +115,10 @@ export const ExampleDatapoints = ({selectedDatapoints, onSelectedDatapoints, pat
         Choose All Datapoints
       </Checkbox>
       <Divider />
-      <CheckboxGroup options={selectedDatapoints.map((item)=> item?.label)} value={checkedList} onChange={onChange} />
+      <CheckboxGroup options={checkedList.map((item)=> item?.label)} value={selectedDatapoints} onChange={onChange} />
+      <Button style={{marginTop:'5%'}}  shape="round" size="small" onClick={ onSendData}>
+        Get Datapoints
+      </Button>
   </>
   }
   </div>
